@@ -2,13 +2,14 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Data.SqlClient;
 using System;
+using System.Text.RegularExpressions;
 
 namespace ProgrammerTuajew.Pages.Register
 {
     public class CustomRegisterModel : PageModel
     {
         public string ErrorMessage { get; set; }
-        public string SuccessMessage { get; set; }  // ข้อความสำหรับแสดงผลเมื่อเพิ่มข้อมูลสำเร็จ
+        public string SuccessMessage { get; set; }  // Message for successful registration
 
         [BindProperty]
         public string Email { get; set; }
@@ -20,32 +21,66 @@ namespace ProgrammerTuajew.Pages.Register
         public string ConfirmPassword { get; set; }
 
         [BindProperty]
-        public string Department { get; set; } // เพิ่มฟิลด์ Department
+        public string Department { get; set; } // Department field
+
+        [BindProperty]
+        public string PhoneNumber { get; set; } // Phone number field
 
         public IActionResult OnPost()
         {
-            if (string.IsNullOrEmpty(Email) || string.IsNullOrEmpty(Password) || string.IsNullOrEmpty(ConfirmPassword) || string.IsNullOrEmpty(Department))
+            if (string.IsNullOrEmpty(Email) || string.IsNullOrEmpty(Password) || string.IsNullOrEmpty(ConfirmPassword) || string.IsNullOrEmpty(Department) || string.IsNullOrEmpty(PhoneNumber))
             {
-                ErrorMessage = "กรุณากรอกข้อมูลให้ครบทุกช่อง.";
+                ErrorMessage = "Please fill in all fields.";
+                return Page();
+            }
+
+            // Validate phone number: must be 10 digits (xxxxxxxxxx)
+            if (!Regex.IsMatch(PhoneNumber, @"^\d{10}$"))
+            {
+                ErrorMessage = "Phone number must be exactly 10 digits (format: xxxxxxxxxx) and contain only numbers.";
+                return Page();
+            }
+
+            // Validate Email: must not be only numbers, must include letters, and no whitespace allowed
+            if (Regex.IsMatch(Email, @"^\d+$"))
+            {
+                ErrorMessage = "Email must include letters and cannot be only numbers.";
+                return Page();
+            }
+            if (Email.Contains(" "))
+            {
+                ErrorMessage = "Email cannot contain spaces.";
+                return Page();
+            }
+            if (!Email.Contains("@example"))
+            {
+                ErrorMessage = "Email must follow the correct format (e.g., user@example.com).";
+                return Page();
+            }
+
+            // Validate Password: no whitespace allowed
+            if (Password.Contains(" "))
+            {
+                ErrorMessage = "Password cannot contain spaces.";
                 return Page();
             }
 
             if (Password != ConfirmPassword)
             {
-                ErrorMessage = "รหัสผ่านไม่ตรงกัน.";
+                ErrorMessage = "Passwords do not match.";
                 return Page();
             }
 
             try
             {
-                // เชื่อมต่อกับฐานข้อมูล โดยใช้ตาราง `password`
+                // Connect to the database using the `password` table
                 string connectionString = "Server=tcp:datacs436.database.windows.net,1433;Initial Catalog=databaseCs436;Persist Security Info=False;User ID=maysa;Password=Masa1234;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
 
                 using (SqlConnection connection = new SqlConnection(connectionString))
                 {
                     connection.Open();
 
-                    // ตรวจสอบว่าอีเมลที่ลงทะเบียนซ้ำหรือไม่
+                    // Check if the email is already registered
                     string checkEmailSql = "SELECT COUNT(*) FROM password WHERE Email = @Email";
                     using (SqlCommand checkEmailCommand = new SqlCommand(checkEmailSql, connection))
                     {
@@ -53,30 +88,31 @@ namespace ProgrammerTuajew.Pages.Register
                         int count = (int)checkEmailCommand.ExecuteScalar();
                         if (count > 0)
                         {
-                            ErrorMessage = "อีเมลนี้ถูกใช้ไปแล้ว.";
+                            ErrorMessage = "This email is already registered.";
                             return Page();
                         }
                     }
 
-                    // เพิ่มข้อมูลลงในตาราง `password` พร้อมกับ Department
-                    string sql = "INSERT INTO password (Email, Password, Department) VALUES (@Email, @Password, @Department)";
+                    // Insert data into the `password` table along with Department and PhoneNumber
+                    string sql = "INSERT INTO password (Email, Password, Department, PhoneNumber) VALUES (@Email, @Password, @Department, @PhoneNumber)";
                     using (SqlCommand command = new SqlCommand(sql, connection))
                     {
                         command.Parameters.AddWithValue("@Email", Email);
                         command.Parameters.AddWithValue("@Password", Password);
                         command.Parameters.AddWithValue("@Department", Department);
+                        command.Parameters.AddWithValue("@PhoneNumber", PhoneNumber);
 
                         command.ExecuteNonQuery();
                     }
                 }
 
-                // หลังจากสมัครเสร็จให้แสดงข้อความสำเร็จ
-                SuccessMessage = "สมัครสมาชิกสำเร็จ!";
+                // Show success message after registration
+                SuccessMessage = "Registration successful!";
                 return RedirectToPage("/Login/CustomLogin");
             }
             catch (Exception ex)
             {
-                ErrorMessage = $"เกิดข้อผิดพลาด: {ex.Message}";
+                ErrorMessage = $"An error occurred: {ex.Message}";
             }
 
             return Page();

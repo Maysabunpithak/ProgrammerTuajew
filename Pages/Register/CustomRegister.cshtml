@@ -31,7 +31,6 @@
                     <label for="confirmPassword" style="color: white;">Confirm Password</label>
                     <input type="password" id="confirmPassword" name="ConfirmPassword" class="form-control" asp-for="ConfirmPassword" required />
                 </div>
-
                 <div class="form-group mt-3">
                     <label for="department" style="color: white;">Department</label>
                     <select id="department" name="Department" class="form-control" asp-for="Department" required>
@@ -42,7 +41,11 @@
                         <option value="Warehouse">Warehouse</option>
                     </select>
                 </div>
-
+                <div class="form-group mt-3">
+                    <label for="phoneNumber" style="color: white;">Phone Number</label>
+                    <input type="text" id="phoneNumber" name="PhoneNumber" class="form-control" asp-for="PhoneNumber"
+                           maxlength="15" pattern="\d*" required title="Only numeric values are allowed." />
+                </div>
                 <button type="submit" class="btn btn-primary w-100 mt-4">Register</button>
             </form>
         </div>
