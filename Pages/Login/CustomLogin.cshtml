@@ -1,0 +1,64 @@
+﻿@page
+@model ProgrammerTuajew.Pages.CustomLogin.LoginModel
+@{
+    ViewData["Title"] = "Login";
+}
+
+<div class="d-flex justify-content-center align-items-center" style="background-color: #47d0fe; height: 100vh;">
+    <div class="card" style="background-color: #03598f; color: white; border-radius: 15px; padding: 20px; max-width: 400px; width: 100%;">
+        <div class="card-body">
+            <h2 class="text-center">Login</h2>
+
+            <!-- แสดงข้อความข้อผิดพลาดเมื่อการล็อกอินไม่สำเร็จ -->
+            @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+            {
+                <div id="error-message" class="alert alert-danger" style="background-color: #ffcccc; color: #660000;">
+                    @Model.ErrorMessage
+                    <button type="button" onclick="hideErrorMessage()" class="close" style="color: #660000;">&times;</button>
+                </div>
+            }
+
+            <!-- ฟอร์มล็อกอิน -->
+            <form method="post">
+                <div class="form-group">
+                    <label for="email" style="color: white;">Email</label>
+                    <input type="text" id="email" name="Email" class="form-control" required />
+                </div>
+                <div class="form-group mt-3">
+                    <label for="password" style="color: white;">Password</label>
+                    <input type="password" id="password" name="Password" class="form-control" required />
+                </div>
+
+                <!-- Dropdown สำหรับเลือกแผนก -->
+                <div class="form-group mt-3">
+                    <label for="department" style="color: white;">Department</label>
+                    <select id="department" name="Department" class="form-control" required>
+                        <option value="">Select Department</option>
+                        <option value="SaleD1">SaleD1</option>
+                        <option value="SaleD2">SaleD2</option>
+                        <option value="SaleD3">SaleD3</option>
+                        <option value="Warehouse">Warehouse</option>
+                    </select>
+                </div>
+
+                <div class="form-check mt-3">
+                    <input type="checkbox" id="rememberMe" name="RememberMe" class="form-check-input" />
+                    <label class="form-check-label" for="rememberMe" style="color: white;">Remember me?</label>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 mt-4">Log in</button>
+            </form>
+
+            <div class="text-end mt-3">
+                <!-- ลิงก์ไปยังหน้ากู้คืนรหัสผ่านและลงทะเบียน -->
+                <a asp-page="/ForgotPassword/ForgotPassword" style="color: #b3e5fc;">Forgot your password?</a><br />
+                <a asp-page="/Register/CustomRegister" style="color: #b3e5fc;">Register as a new user</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function hideErrorMessage() {
+        document.getElementById("error-message").style.display = "none";
+    }
+</script>

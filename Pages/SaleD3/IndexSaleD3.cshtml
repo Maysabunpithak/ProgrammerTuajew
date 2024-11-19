@@ -1,0 +1,171 @@
+﻿@page
+@model ProgrammerTuajew.Pages.SaleD3.IndexSaleD3Model
+@{
+    ViewData["Title"] = "SaleD3";
+}
+
+<style>
+    /* พื้นหลังของหน้า */
+    body {
+        background-color: transparent; /* สีพื้นหลังฟ้าเข้ม */
+    }
+
+    /* กล่อง Add Email และตาราง */
+    .container {
+        background-color: #4CC9FE; /* พื้นหลังสีฟ้าอ่อน */
+        border-radius: 0px; /* ขอบมน */
+        padding: 20px; /* ระยะห่างด้านใน */
+        max-width: 1310px; /* กำหนดความกว้างสูงสุด (ปรับให้กว้างขึ้น) */
+        max-height: auto;
+        margin: 20px auto; /* ลดระยะห่างด้านบน-ล่าง */
+        box-shadow: 0px 0px 0px rgba(0, 0, 0, 0.1); /* เพิ่มเงา */
+    }
+
+    /* ปุ่ม Add Email สีใหม่ */
+    .btn-add-email {
+        background-color: #3D3BF3 !important; /* สีส้มสด */
+        color: white !important; /* ตัวอักษรสีขาว */
+        border-color: #3D3BF3 !important; /* สีขอบตรงกับพื้นหลัง */
+        font-family: 'Poppins', sans-serif; /* เปลี่ยนฟอนต์ (ถ้าต้องการ) */
+        font-size: 16px; /* กำหนดขนาดฟอนต์ */
+        font-weight: bold; /* ความหนา */
+    }
+
+        .btn-add-email:hover {
+            background-color: #006BFF !important; /* สีอ่อนขึ้นเมื่อ Hover */
+        }
+
+    .btn-inbox {
+        background-color: #3C3D37 !important; /* สีเหลือง */
+        color: white !important; /* สีตัวอักษรดำ */
+        border-color: #3C3D37 !important; /* สีขอบตรงกับพื้นหลัง */
+        font-family: 'Poppins', sans-serif; /* กำหนดฟอนต์ */
+        font-size: 16px; /* กำหนดขนาดฟอนต์ */
+        font-weight: bold; /* กำหนดความหนา */
+    }
+
+        .btn-inbox:hover {
+            background-color: #697565 !important; /* สีเหลืองอ่อนเมื่อ Hover */
+            color: white !important;
+        }
+
+    .btn-sent {
+        background-color: #FFE31A !important; /* สีเขียว */
+        color: black !important; /* สีตัวอักษรขาว */
+        border-color: #FFE31A !important; /* สีขอบตรงกับพื้นหลัง */
+        font-family: 'Poppins', sans-serif; /* กำหนดฟอนต์ */
+        font-size: 16px; /* กำหนดขนาดฟอนต์ */
+        font-weight: bold; /* กำหนดความหนา */
+    }
+
+        .btn-sent:hover {
+            background-color: #FFF100 !important; /* สีเขียวอ่อนเมื่อ Hover */
+            color: black !important;
+        }
+
+
+    /* หัวตาราง */
+    .table th {
+        background-color: #37AFE1; /* พื้นหลังหัวตาราง */
+        color: white; /* ตัวอักษรหัวตาราง */
+        text-align: center;
+        font-weight: bold;
+        border-bottom: 2px solid white; /* เส้นขอบด้านล่าง */
+    }
+
+    /* แถวของตาราง */
+    .table tr:nth-child(even) {
+        background-color: white; /* แถวสีฟ้าอ่อน */
+    }
+
+    .table tr:nth-child(odd) {
+        background-color: white; /* แถวสีขาว */
+    }
+
+    .table td {
+        color: black; /* ตัวอักษรในตาราง */
+        text-align: center;
+        padding: 10px; /* ระยะห่างในช่อง */
+    }
+
+    /* ปุ่ม */
+    .btn {
+        font-size: 0.85em;
+        margin-right: 5px; /* ระยะห่างระหว่างปุ่ม */
+    }
+
+    .action-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 0.5em;
+    }
+</style>
+
+<div class="mb-3">
+    <a class="btn btn-add-email" href="/SaleD3/CreateSaleD3">Add Email</a>
+    <a class="btn btn-inbox" href="/SaleD3/IndexSaleD3?view=inbox">Inbox</a>
+    <a class="btn btn-sent" href="/SaleD3/IndexSaleD3?view=sent">Sent</a>
+</div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+            <strong>@TempData["SuccessMessage"]</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <table class="table table-bordered mt-3">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Sender</th>
+                <th>Receiver</th>
+                <th>Receiver Department</th>
+                <th>Subject</th>
+                <th>Body</th>
+                <th>Date Sent</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.View.ToLower() == "inbox" && Model.InboxList.Count == 0)
+            {
+                <tr>
+                    <td colspan="8" class="text-center">ไม่มีข้อมูลใน Inbox</td>
+                </tr>
+            }
+            else if (Model.View.ToLower() == "sent" && Model.SentList.Count == 0)
+            {
+                <tr>
+                    <td colspan="8" class="text-center">ไม่มีข้อมูลใน Sent</td>
+                </tr>
+            }
+            else
+            {
+                var emailList = Model.View.ToLower() == "sent" ? Model.SentList : Model.InboxList;
+                foreach (var item in emailList)
+                {
+                    <tr>
+                        <td>@item.Id</td>
+                        <td>@item.Sender</td>
+                        <td>@item.Receiver</td>
+                        <td>@item.ReceiverDepartment</td>
+                        <td>@item.Subject</td>
+                        <td>@item.Body</td>
+                        <td>@item.DateSent?.ToString("yyyy-MM-dd")</td>
+                        <td>
+                            <div class="action-buttons">
+                                @if (Model.View.ToLower() == "sent")
+                                {
+                                    <a asp-page="./EditSaleD3" asp-route-itemid="@item.Id" asp-route-view="@Model.View" class="btn btn-primary btn-sm">Edit</a>
+                                }
+                                <a asp-page="./DeleteSaleD3" asp-route-itemid="@item.Id" asp-route-view="@Model.View" class="btn btn-danger btn-sm">Delete</a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</div>

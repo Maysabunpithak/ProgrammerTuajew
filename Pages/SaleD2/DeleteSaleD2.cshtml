@@ -1,0 +1,62 @@
+﻿@page
+@using Microsoft.Data.SqlClient;
+
+@{
+    string Id = Request.Query["itemid"]; // รับ ID จาก Query String
+    string viewType = Request.Query["view"].ToString().ToLower(); // รับ view (inbox หรือ sent) จาก Query String
+    string errorMessage = null;
+    string successMessage = null;
+
+    try
+    {
+        if (!string.IsNullOrEmpty(Id) && int.TryParse(Id, out int emailId)) // ตรวจสอบว่า ID ไม่ว่างและเป็นตัวเลข
+        {
+            string connectionString = "Server=tcp:datacs436.database.windows.net,1433;Initial Catalog=databaseCs436;Persist Security Info=False;User ID=maysa;Password=Masa1234;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+
+                // SQL สำหรับลบข้อมูล
+                string sql = "DELETE FROM SaleD1 WHERE Id = @Id";
+                using (SqlCommand command = new SqlCommand(sql, connection))
+                {
+                    command.Parameters.AddWithValue("@Id", emailId); // ส่งพารามิเตอร์ ID ไปยังคำสั่ง SQL
+                    int rowsAffected = command.ExecuteNonQuery();
+
+                    if (rowsAffected > 0)
+                    {
+                        successMessage = "Email has been successfully deleted.";
+                        Response.Redirect($"/SaleD2/IndexSaleD2?view={viewType}"); // Redirect กลับไปยังหน้าเดิม (inbox หรือ sent)
+                    }
+                    else
+                    {
+                        errorMessage = "No email found with the given ID.";
+                    }
+                }
+            }
+        }
+        else
+        {
+            errorMessage = "Invalid or missing email ID.";
+        }
+    }
+    catch (SqlException sqlEx)
+    {
+        errorMessage = $"Database error: {sqlEx.Message}";
+    }
+    catch (Exception ex)
+    {
+        errorMessage = $"An unexpected error occurred: {ex.Message}";
+    }
+}
+
+@if (!string.IsNullOrEmpty(successMessage))
+{
+    <div class="alert alert-success">@successMessage</div>
+}
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}

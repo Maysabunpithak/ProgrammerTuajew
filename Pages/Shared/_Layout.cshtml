@@ -1,0 +1,102 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"] - ProgrammerTuajew</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <style>
+        .navbar {
+            background-color: #47d0fe; /* พื้นหลัง Navbar สีฟ้า */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* เพิ่มเงา */
+            padding: 0.5rem 1rem;
+            width: 86%; /* กำหนดความกว้าง */
+            margin: auto; /* จัดให้อยู่กึ่งกลางในแนวนอน */
+            position: relative; /* ตั้ง position เพื่อปรับเลย์เอาต์ */
+            top: 0; /* เริ่มต้นที่ตำแหน่งบน */
+            left: 0; /* เริ่มต้นที่ตำแหน่งซ้าย */
+            right: 0; /* ขยายเต็มจากขวา */
+            text-align: center; /* จัดข้อความให้อยู่กึ่งกลาง */
+            font-family: 'Poppins', sans-serif; /* เปลี่ยนฟอนต์ (ถ้าต้องการ) */
+            font-size: 16px; /* กำหนดขนาดฟอนต์ */
+            font-weight: bold; /* ความหนา */
+        }
+
+            .navbar .navbar-brand {
+                background-color: transparent; /* ลบพื้นหลังของ ProgrammerTuajew */
+                color: #fff !important; /* ตัวอักษรสีขาว */
+                padding: 0.5rem 1rem;
+                border-radius: 0; /* ลบความโค้งของมุม */
+                font-weight: bold;
+            }
+
+            .navbar .nav-link {
+                color: #fff !important; /* ตัวอักษรสีขาว */
+            }
+
+                .navbar .nav-link:hover {
+                    color: #e0f7ff !important; /* สีขาวจางเมื่อ Hover */
+                }
+    </style>
+
+
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm border-bottom mb-3">
+            <div class="container">
+                <a class="navbar-brand" asp-area="" asp-page="/Index">ProgrammerTuajew</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+                        @if (Context.Session.GetString("UserEmail") != null) // ตรวจสอบว่าผู้ใช้ล็อกอินอยู่หรือไม่
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-page="/SaleD1/IndexSaleD1" asp-route-view="inbox">SaleD1</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-page="/SaleD2/IndexSaleD2" asp-route-view="inbox">SaleD2</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-page="/SaleD3/IndexSaleD3" asp-route-view="inbox">SaleD3</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-page="/Warehouse/IndexWarehouse" asp-route-view="inbox">Warehouse</a>
+                            </li>
+                        }
+                    </ul>
+                    <ul class="navbar-nav">
+                        @if (Context.Session.GetString("UserEmail") != null)
+                        {
+                            <li class="nav-item">
+                                <span class="nav-link">Hello, @Context.Session.GetString("UserEmail")</span>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-page="/Logout/Logout">Logout</a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-page="/Login/CustomLogin">Login</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-page="/Register/CustomRegister">Register</a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
