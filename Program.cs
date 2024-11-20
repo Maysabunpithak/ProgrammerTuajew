@@ -13,8 +13,17 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
-// Add session services
-builder.Services.AddSession(); // เพิ่มการใช้งาน Session
+// Add distributed memory cache
+builder.Services.AddDistributedMemoryCache();
+
+// Add session services with options
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30); // ระยะเวลา Timeout ของ Session
+    options.Cookie.HttpOnly = true; // ป้องกันการเข้าถึง Cookie จาก JavaScript
+    options.Cookie.IsEssential = true; // ทำให้ Cookie นี้เป็นสิ่งจำเป็นสำหรับการทำงานของแอป
+});
+
 builder.Services.AddRazorPages();
 
 var app = builder.Build();
@@ -33,7 +42,7 @@ app.UseStaticFiles();
 app.UseRouting();
 
 // Enable session middleware
-app.UseSession(); // เปิดใช้งาน Session ที่นี่
+app.UseSession();
 
 app.UseAuthorization();
 

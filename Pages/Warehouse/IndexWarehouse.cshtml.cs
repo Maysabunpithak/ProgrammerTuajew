@@ -17,7 +17,6 @@ namespace ProgrammerTuajew.Pages.Warehouse
 
         public void OnGet()
         {
-            // ตรวจสอบสิทธิ์ของผู้ใช้
             if (!HasAccess("Warehouse"))
             {
                 AccessDenied = true;
@@ -34,10 +33,8 @@ namespace ProgrammerTuajew.Pages.Warehouse
                 using (SqlConnection connection = new SqlConnection(connectionString))
                 {
                     connection.Open();
-
                     if (View == "inbox")
                     {
-                        // ดึงข้อมูล Inbox
                         string inboxSql = "SELECT * FROM SaleD1 WHERE ReceiverDepartment = 'Warehouse'";
                         using (SqlCommand command = new SqlCommand(inboxSql, connection))
                         {
@@ -53,7 +50,8 @@ namespace ProgrammerTuajew.Pages.Warehouse
                                         ReceiverDepartment = reader.GetString(3),
                                         Subject = reader.GetString(4),
                                         Body = reader.GetString(5),
-                                        DateSent = reader.IsDBNull(6) ? (DateTime?)null : reader.GetDateTime(6)
+                                        DateSent = reader.IsDBNull(6) ? (DateTime?)null : reader.GetDateTime(6),
+                                        IsRead = reader.IsDBNull(8) ? (bool?)null : reader.GetBoolean(8)
                                     };
                                     InboxList.Add(email);
                                 }
@@ -62,7 +60,6 @@ namespace ProgrammerTuajew.Pages.Warehouse
                     }
                     else if (View == "sent")
                     {
-                        // ดึงข้อมูล Sent
                         string sentSql = "SELECT * FROM SaleD1 WHERE SenderDepartment = 'Warehouse'";
                         using (SqlCommand command = new SqlCommand(sentSql, connection))
                         {
@@ -79,7 +76,7 @@ namespace ProgrammerTuajew.Pages.Warehouse
                                         Subject = reader.GetString(4),
                                         Body = reader.GetString(5),
                                         DateSent = reader.IsDBNull(6) ? (DateTime?)null : reader.GetDateTime(6),
-                                        ReceiverDepartment = reader.GetString(3)
+                                        IsRead = reader.IsDBNull(8) ? (bool?)null : reader.GetBoolean(8)
                                     };
                                     SentList.Add(email);
                                 }
@@ -94,7 +91,82 @@ namespace ProgrammerTuajew.Pages.Warehouse
             }
         }
 
-        // ฟังก์ชันช่วยตรวจสอบสิทธิ์
+        public JsonResult OnGetEmailDetails(string id)
+        {
+            try
+            {
+                string connectionString = "Server=tcp:datacs436.database.windows.net,1433;Initial Catalog=databaseCs436;Persist Security Info=False;User ID=maysa;Password=Masa1234;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
+                using (SqlConnection connection = new SqlConnection(connectionString))
+                {
+                    connection.Open();
+                    string sql = "SELECT Subject, Body FROM SaleD1 WHERE Id = @Id";
+                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    {
+                        command.Parameters.AddWithValue("@Id", id);
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                var email = new
+                                {
+                                    Subject = reader.GetString(0),
+                                    Body = reader.GetString(1)
+                                };
+                                return new JsonResult(email);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return new JsonResult(new { error = ex.Message });
+            }
+
+            return new JsonResult(new { error = "Email not found" });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult OnPostMarkAsRead(string id)
+        {
+            if (string.IsNullOrEmpty(id))
+            {
+                return new JsonResult(new { success = false, error = "Invalid ID." });
+            }
+
+            try
+            {
+                string connectionString = "Server=tcp:datacs436.database.windows.net,1433;Initial Catalog=databaseCs436;Persist Security Info=False;User ID=maysa;Password=Masa1234;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
+                using (SqlConnection connection = new SqlConnection(connectionString))
+                {
+                    connection.Open();
+
+                    string sql = "UPDATE SaleD1 SET IsRead = 1 WHERE Id = @Id AND (IsRead = 0 OR IsRead IS NULL)";
+                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    {
+                        command.Parameters.AddWithValue("@Id", id);
+                        int rowsAffected = command.ExecuteNonQuery();
+                        Console.WriteLine($"Rows affected: {rowsAffected}");
+
+
+                        if (rowsAffected > 0)
+                        {
+                            return new JsonResult(new { success = true });
+                        }
+                        else
+                        {
+                            return new JsonResult(new { success = false, error = "Record not found or already marked as read." });
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return new JsonResult(new { success = false, error = ex.Message });
+            }
+        }
+
         private bool HasAccess(string department)
         {
             var userDepartment = HttpContext.Session.GetString("UserDepartment");
@@ -111,6 +183,7 @@ namespace ProgrammerTuajew.Pages.Warehouse
             public DateTime? DateSent { get; set; }
             public string SenderDepartment { get; set; }
             public string ReceiverDepartment { get; set; }
+            public bool? IsRead { get; set; }
         }
     }
 }

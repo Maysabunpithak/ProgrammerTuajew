@@ -5,104 +5,71 @@
 }
 
 <style>
-    /* พื้นหลังของหน้า */
     body {
-        background-color: transparent; /* สีพื้นหลังฟ้าเข้ม */
+        background-color: transparent;
     }
 
-    /* กล่อง Add Email และตาราง */
     .container {
-        background-color: #4CC9FE; /* พื้นหลังสีฟ้าอ่อน */
-        border-radius: 0px; /* ขอบมน */
-        padding: 20px; /* ระยะห่างด้านใน */
-        max-width: 1310px; /* กำหนดความกว้างสูงสุด (ปรับให้กว้างขึ้น) */
-        max-height: auto;
-        margin: 20px auto; /* ลดระยะห่างด้านบน-ล่าง */
-        box-shadow: 0px 0px 0px rgba(0, 0, 0, 0.1); /* เพิ่มเงา */
+        background-color: #4CC9FE;
+        border-radius: 0px;
+        padding: 20px;
+        max-width: 1310px;
+        margin: 20px auto;
+        box-shadow: 0px 0px 0px rgba(0, 0, 0, 0.1);
     }
 
-    /* ปุ่ม Add Email สีใหม่ */
     .btn-add-email {
-        background-color: #3D3BF3 !important; /* สีส้มสด */
-        color: white !important; /* ตัวอักษรสีขาว */
-        border-color: #3D3BF3 !important; /* สีขอบตรงกับพื้นหลัง */
-        font-family: 'Poppins', sans-serif; /* เปลี่ยนฟอนต์ (ถ้าต้องการ) */
-        font-size: 16px; /* กำหนดขนาดฟอนต์ */
-        font-weight: bold; /* ความหนา */
+        background-color: #3D3BF3 !important;
+        color: white !important;
+        font-size: 16px;
+        font-weight: bold;
     }
 
-        .btn-add-email:hover {
-            background-color: #006BFF !important; /* สีอ่อนขึ้นเมื่อ Hover */
-        }
+    .btn-inbox, .btn-sent {
+        font-size: 16px;
+        font-weight: bold;
+    }
 
     .btn-inbox {
-        background-color: #3C3D37 !important; /* สีเหลือง */
-        color: white !important; /* สีตัวอักษรดำ */
-        border-color: #3C3D37 !important; /* สีขอบตรงกับพื้นหลัง */
-        font-family: 'Poppins', sans-serif; /* กำหนดฟอนต์ */
-        font-size: 16px; /* กำหนดขนาดฟอนต์ */
-        font-weight: bold; /* กำหนดความหนา */
+        background-color: #3C3D37 !important;
+        color: white !important;
     }
-
-        .btn-inbox:hover {
-            background-color: #697565 !important; /* สีเหลืองอ่อนเมื่อ Hover */
-            color: white !important;
-        }
 
     .btn-sent {
-        background-color: #FFE31A !important; /* สีเขียว */
-        color: black !important; /* สีตัวอักษรขาว */
-        border-color: #FFE31A !important; /* สีขอบตรงกับพื้นหลัง */
-        font-family: 'Poppins', sans-serif; /* กำหนดฟอนต์ */
-        font-size: 16px; /* กำหนดขนาดฟอนต์ */
-        font-weight: bold; /* กำหนดความหนา */
+        background-color: #FFE31A !important;
+        color: black !important;
     }
 
-        .btn-sent:hover {
-            background-color: #FFF100 !important; /* สีเขียวอ่อนเมื่อ Hover */
-            color: black !important;
-        }
-
-
-    /* หัวตาราง */
     .table th {
-        background-color: #37AFE1; /* พื้นหลังหัวตาราง */
-        color: white; /* ตัวอักษรหัวตาราง */
+        background-color: #37AFE1;
+        color: white;
         text-align: center;
         font-weight: bold;
-        border-bottom: 2px solid white; /* เส้นขอบด้านล่าง */
     }
 
-    /* แถวของตาราง */
-    .table tr:nth-child(even) {
-        background-color: white; /* แถวสีฟ้าอ่อน */
+    #email-popup {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 40%;
+        padding: 20px;
+        background: #4CC9FE;
+        border: 1px solid black;
+        z-index: 1000;
+        color: white;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
     }
+   
 
-    .table tr:nth-child(odd) {
-        background-color: white; /* แถวสีขาว */
-    }
+        #email-popup button:active {
+            background-color: #FFB000; /* สีเมื่อคลิกปุ่ม */
+        }
 
-    .table td {
-        color: black; /* ตัวอักษรในตาราง */
-        text-align: center;
-        padding: 10px; /* ระยะห่างในช่อง */
-    }
-
-    /* ปุ่ม */
-    .btn {
-        font-size: 0.85em;
-        margin-right: 5px; /* ระยะห่างระหว่างปุ่ม */
-    }
-
-    .action-buttons {
-        display: flex;
-        justify-content: center;
-        gap: 0.5em;
-    }
 </style>
 
-
-<!-- กล่อง Add Email และตาราง -->
 <div class="container">
     @if (TempData["SuccessMessage"] != null)
     {
@@ -111,6 +78,11 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
+
+    <form id="csrf-form" method="post">
+        @Html.AntiForgeryToken()
+    </form>
+
 
     <div class="mb-3">
         <a class="btn btn-add-email" href="/SaleD1/CreateSaleD1">Add Email</a>
@@ -126,8 +98,8 @@
                 <th>Receiver</th>
                 <th>Receiver Department</th>
                 <th>Subject</th>
-                <th>Body</th>
                 <th>Date Sent</th>
+                <th>Status</th>
                 <th>Action</th>
             </tr>
         </thead>
@@ -138,26 +110,33 @@
                     <td colspan="8" class="text-center">ไม่มีข้อมูลใน Inbox</td>
                 </tr>
             }
-            else if (Model.View.ToLower() == "sent" && Model.SentList.Count == 0)
-            {
-                <tr>
-                    <td colspan="8" class="text-center">ไม่มีข้อมูลใน Sent</td>
-                </tr>
-            }
             else
             {
                 var emailList = Model.View.ToLower() == "sent" ? Model.SentList : Model.InboxList;
                 foreach (var item in emailList)
                 {
-                    <tr>
+                    <tr data-id="@item.Id">
                         <td>@item.Id</td>
                         <td>@item.Sender</td>
                         <td>@item.Receiver</td>
                         <td>@item.ReceiverDepartment</td>
                         <td>@item.Subject</td>
-                        <td>@item.Body</td>
                         <td>@item.DateSent?.ToString("yyyy-MM-dd")</td>
                         <td>
+                            @if (item.IsRead == true)
+                            {
+                                <span class="badge bg-success">Read</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger">Unread</span>
+                            }
+                        </td>
+                        <td>
+                            <button class="btn btn-info btn-sm"
+                                    onclick="showEmailDetails('@item.Id', '@item.Sender', '@item.Receiver', '@item.ReceiverDepartment', '@item.Subject', '@item.DateSent?.ToString("yyyy-MM-dd")')">
+                                View
+                            </button>
                             <div class="action-buttons">
                                 @if (Model.View.ToLower() == "sent")
                                 {
@@ -167,9 +146,81 @@
                             </div>
                         </td>
                     </tr>
+
                 }
             }
         </tbody>
     </table>
 </div>
-  
+
+<div id="email-popup">
+    <p id="popup-id"></p>
+    <p id="popup-sender"></p>
+    <p id="popup-receiver"></p>
+    <p id="popup-receiver-department"></p>
+    <p id="popup-subject"></p>
+    <p id="popup-date-sent"></p>
+    <button onclick="closePopup()">Close</button>
+</div>
+<script>
+    // ดึงค่า Anti-Forgery Token
+    function getAntiForgeryToken() {
+        return document.querySelector('input[name="__RequestVerificationToken"]').value;
+    }
+
+    // แสดงป๊อปอัปพร้อมส่งคำขอไปยังเซิร์ฟเวอร์
+    function showEmailDetails(id, sender, receiver, receiverDepartment, subject, dateSent) {
+        document.getElementById('popup-id').innerText = "ID: " + id;
+        document.getElementById('popup-sender').innerText = "Sender: " + sender;
+        document.getElementById('popup-receiver').innerText = "Receiver: " + receiver;
+        document.getElementById('popup-receiver-department').innerText = "Receiver Department: " + receiverDepartment;
+        document.getElementById('popup-subject').innerText = "Subject: " + subject;
+        document.getElementById('popup-date-sent').innerText = "Date Sent: " + dateSent;
+        document.getElementById('email-popup').style.display = 'block';
+
+        // ส่งคำขอเพื่ออัปเดตสถานะ
+        fetch(`/SaleD1/IndexSaleD1?handler=MarkAsRead&id=${id}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': getAntiForgeryToken()
+            }
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    // อัปเดตสถานะในตาราง
+                    const row = document.querySelector(`tr[data-id='${id}']`);
+                    if (row) {
+                        const statusBadge = row.querySelector('.badge');
+                        if (statusBadge) {
+                            statusBadge.classList.remove('bg-danger');
+                            statusBadge.classList.add('bg-success');
+                            statusBadge.innerText = 'Read';
+                        }
+                    }
+                } else {
+                    console.error("Failed to update status. Server response:", data.error);
+                }
+            })
+            .catch(err => console.error("Request failed:", err));
+    }
+
+    // ปิดป๊อปอัป
+    function closePopup() {
+        document.getElementById('email-popup').style.display = 'none';
+
+    }
+    function getAntiForgeryToken() {
+        return document.querySelector('input[name="__RequestVerificationToken"]').value;
+    }
+
+</script>
+
+
+
