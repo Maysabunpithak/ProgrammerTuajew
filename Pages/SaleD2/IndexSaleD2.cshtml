@@ -92,6 +92,7 @@
                 <th>Receiver</th>
                 <th>Receiver Department</th>
                 <th>Subject</th>
+                <th>Body</th>
                 <th>Date Sent</th>
                 <th>Status</th>
                 <th>Action</th>
@@ -115,6 +116,7 @@
                         <td>@item.Receiver</td>
                         <td>@item.ReceiverDepartment</td>
                         <td>@item.Subject</td>
+                        <td>@item.Body</td>
                         <td>@item.DateSent?.ToString("yyyy-MM-dd")</td>
                         <td>
                             @if (item.IsRead == true)
@@ -128,7 +130,7 @@
                         </td>
                         <td>
                             <button class="btn btn-info btn-sm"
-                                    onclick="showEmailDetails('@item.Id', '@item.Sender', '@item.Receiver', '@item.ReceiverDepartment', '@item.Subject', '@item.DateSent?.ToString("yyyy-MM-dd")')">
+                                    onclick="showEmailDetails('@item.Id', '@item.Sender', '@item.Receiver', '@item.ReceiverDepartment', '@item.Subject', '@item.Body', '@item.DateSent?.ToString("yyyy-MM-dd")')">
                                 View
                             </button>
                             <div class="action-buttons">
@@ -153,6 +155,7 @@
     <p id="popup-receiver"></p>
     <p id="popup-receiver-department"></p>
     <p id="popup-subject"></p>
+    <p id="popup-body"></p>
     <p id="popup-date-sent"></p>
     <button onclick="closePopup()">Close</button>
 </div>
@@ -163,12 +166,13 @@
     }
 
     // แสดงป๊อปอัปพร้อมส่งคำขอไปยังเซิร์ฟเวอร์
-    function showEmailDetails(id, sender, receiver, receiverDepartment, subject, dateSent) {
+    function showEmailDetails(id, sender, receiver, receiverDepartment, subject,body, dateSent) {
         document.getElementById('popup-id').innerText = "ID: " + id;
         document.getElementById('popup-sender').innerText = "Sender: " + sender;
         document.getElementById('popup-receiver').innerText = "Receiver: " + receiver;
         document.getElementById('popup-receiver-department').innerText = "Receiver Department: " + receiverDepartment;
         document.getElementById('popup-subject').innerText = "Subject: " + subject;
+        document.getElementById('popup-body').innerText = "Body: " + body;
         document.getElementById('popup-date-sent').innerText = "Date Sent: " + dateSent;
         document.getElementById('email-popup').style.display = 'block';
 
